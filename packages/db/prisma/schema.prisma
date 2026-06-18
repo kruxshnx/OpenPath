@@ -1,0 +1,258 @@
+// OpenPath data model — see TECHNICAL_PLAN.md §3.
+// Source of truth in PostgreSQL. Scores (health, difficulty, recommendations)
+// are precomputed by background workers and stored here for fast serving.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum ExperienceLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum SkillType {
+  LANGUAGE
+  FRAMEWORK
+  TOOL
+  DOMAIN
+}
+
+enum SkillSource {
+  SELF_REPORTED
+  INFERRED_FROM_REPOS
+}
+
+enum HealthRating {
+  EXCELLENT
+  GOOD
+  MODERATE
+  POOR
+}
+
+enum DifficultyLevel {
+  BEGINNER
+  EASY
+  MEDIUM
+  ADVANCED
+}
+
+enum EstimatedTimeBucket {
+  ONE_TO_TWO_HOURS
+  HALF_DAY
+  ONE_TO_TWO_DAYS
+  MULTIPLE_DAYS
+}
+
+// ---------------------------------------------------------------------------
+// Users & skills (Module 1, 5)
+// ---------------------------------------------------------------------------
+
+model User {
+  id              String          @id @default(cuid())
+  githubId        BigInt          @unique
+  login           String          @unique
+  name            String?
+  avatarUrl       String?
+  email           String?
+  accessToken     String? // encrypt at the application layer before storing
+  experienceLevel ExperienceLevel @default(BEGINNER)
+  interests       String[] // domain tags, e.g. "ai-ml", "devops"
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  skills          UserSkill[]
+  recommendations Recommendation[]
+}
+
+model Skill {
+  id        String      @id @default(cuid())
+  name      String      @unique
+  type      SkillType
+  aliases   String[] // "js" -> "JavaScript", "k8s" -> "Kubernetes"
+  createdAt DateTime    @default(now())
+
+  users     UserSkill[]
+}
+
+model UserSkill {
+  userId  String
+  skillId String
+  source  SkillSource @default(SELF_REPORTED)
+  weight  Float       @default(1)
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill   Skill       @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([userId, skillId])
+  @@index([skillId])
+}
+
+// ---------------------------------------------------------------------------
+// Repositories (Module 2, 3)
+// ---------------------------------------------------------------------------
+
+model Repository {
+  id                String        @id @default(cuid())
+  githubId          BigInt        @unique
+  fullName          String        @unique // "owner/name"
+  description       String?
+  primaryLanguage   String?
+  stars             Int           @default(0)
+  forks             Int           @default(0)
+  watchers          Int           @default(0)
+  openIssuesCount   Int           @default(0)
+  contributorsCount Int           @default(0)
+  pushedAt          DateTime?
+  repoCreatedAt     DateTime?
+  archived          Boolean       @default(false)
+
+  // computed by the health scoring engine (TECHNICAL_PLAN.md §5a)
+  healthScore       Float?
+  healthRating      HealthRating?
+  healthBreakdown   Json?
+
+  lastIngestedAt    DateTime?
+  lastScoredAt      DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  languages         RepositoryLanguage[]
+  topics            RepositoryTopic[]
+  issues            Issue[]
+  maintainers       Maintainer[]
+  metrics           RepositoryMetric[]
+  recommendations   Recommendation[]
+
+  @@index([healthScore(sort: Desc)])
+  @@index([primaryLanguage])
+}
+
+model RepositoryLanguage {
+  id           String     @id @default(cuid())
+  repositoryId String
+  language     String
+  bytes        Int
+
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([repositoryId, language])
+  @@index([language])
+}
+
+model RepositoryTopic {
+  id           String     @id @default(cuid())
+  repositoryId String
+  topic        String
+
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([repositoryId, topic])
+  @@index([topic])
+}
+
+// ---------------------------------------------------------------------------
+// Issues (Module 4) — note the research-label columns
+// ---------------------------------------------------------------------------
+
+model Issue {
+  id                           String               @id @default(cuid())
+  githubId                     BigInt               @unique
+  repositoryId                 String
+  number                       Int
+  title                        String
+  body                         String?
+  state                        String // "open" | "closed"
+  labels                       String[]
+  commentsCount                Int                  @default(0)
+  issueCreatedAt               DateTime
+  closedAt                     DateTime?
+
+  // research labels mined from history (TECHNICAL_PLAN.md §5b) — used as ground
+  // truth for the difficulty / success models. Populate during ingestion.
+  closedByFirstTimeContributor Boolean?
+  resolutionHours              Float?
+
+  // computed by the issue intelligence engine
+  difficultyLevel              DifficultyLevel?
+  difficultyScore              Float?
+  estimatedTimeBucket          EstimatedTimeBucket?
+  difficultyFeatures           Json?
+  lastScoredAt                 DateTime?
+
+  createdAt                    DateTime             @default(now())
+  updatedAt                    DateTime             @updatedAt
+
+  repository                   Repository           @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  recommendations              Recommendation[]
+
+  @@unique([repositoryId, number])
+  @@index([repositoryId, state])
+  @@index([difficultyLevel])
+}
+
+// ---------------------------------------------------------------------------
+// Maintainers & metrics (Module 3, trending)
+// ---------------------------------------------------------------------------
+
+model Maintainer {
+  id                       String     @id @default(cuid())
+  repositoryId             String
+  githubLogin              String
+  medianIssueResponseHours Float?
+  medianPrReviewHours      Float?
+  mergeRate                Float?
+  friendlinessScore        Float?
+  lastActiveAt             DateTime?
+
+  repository               Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@unique([repositoryId, githubLogin])
+}
+
+model RepositoryMetric {
+  id              String     @id @default(cuid())
+  repositoryId    String
+  capturedAt      DateTime   @default(now())
+  stars           Int
+  forks           Int
+  openIssues      Int
+  commitCount30d  Int?
+  releaseCount90d Int?
+
+  repository      Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  @@index([repositoryId, capturedAt])
+}
+
+// ---------------------------------------------------------------------------
+// Recommendations (Module 6) — precomputed per user
+// ---------------------------------------------------------------------------
+
+model Recommendation {
+  id              String     @id @default(cuid())
+  userId          String
+  repositoryId    String
+  issueId         String?
+  skillMatchScore Float
+  compositeScore  Float
+  scoreBreakdown  Json
+  generatedAt     DateTime   @default(now())
+
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repository      Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  issue           Issue?     @relation(fields: [issueId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, repositoryId, issueId])
+  @@index([userId, compositeScore(sort: Desc)])
+}

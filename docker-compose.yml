@@ -1,0 +1,32 @@
+# Local dev infrastructure: PostgreSQL + Redis.
+# Requires Docker. If you don't want to install Docker, see README "Option B"
+# (Neon + Upstash free tiers) and just set DATABASE_URL / REDIS_URL in .env.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: openpath
+      POSTGRES_PASSWORD: openpath
+      POSTGRES_DB: openpath
+    ports:
+      - "5432:5432"
+    volumes:
+      - openpath_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openpath"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - openpath_redisdata:/data
+
+volumes:
+  openpath_pgdata:
+  openpath_redisdata:

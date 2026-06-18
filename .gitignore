@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+.pnp.*
+.yarn/*
+
+# builds
+dist/
+.next/
+out/
+build/
+*.tsbuildinfo
+
+# env
+.env
+.env.local
+.env.*.local
+
+# prisma generated client (regenerated from schema)
+packages/db/src/generated/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+services/ml/.venv/
+
+# logs / os
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# editors
+.vscode/
+.idea/

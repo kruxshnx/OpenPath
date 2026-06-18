@@ -1,0 +1,15 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  async rewrites() {
+    // Proxy /api/backend/* from the browser to the NestJS API to avoid CORS.
+    return [
+      {
+        source: '/api/backend/:path*',
+        destination: `${process.env.API_URL ?? 'http://localhost:4000'}/api/:path*`,
+      },
+    ];
+  },
+};
+
+export default nextConfig;

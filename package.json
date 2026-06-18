@@ -1,0 +1,24 @@
+{
+  "name": "openpath",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Intelligent open-source contribution discovery and recommendation platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev:api": "npm run dev -w @openpath/api",
+    "dev:web": "npm run dev -w @openpath/web",
+    "dev:worker": "npm run dev -w @openpath/worker",
+    "build": "npm run build -w @openpath/db && npm run build --workspaces --if-present",
+    "db:generate": "npm run generate -w @openpath/db",
+    "db:build": "npm run build -w @openpath/db",
+    "db:migrate": "npm run migrate -w @openpath/db",
+    "db:studio": "npm run studio -w @openpath/db",
+    "lint": "npm run lint --workspaces --if-present"
+  }
+}
