@@ -7,7 +7,7 @@ import type { RepositoryIngestData } from './types';
  */
 export async function persistRepositoryData(
   data: RepositoryIngestData,
-): Promise<{ repositoryId: string; issueCount: number }> {
+): Promise<{ repositoryId: string; fullName: string; issueCount: number }> {
   const { repository, languages, topics, issues } = data;
   const now = new Date();
 
@@ -91,5 +91,7 @@ export async function persistRepositoryData(
     });
   }
 
-  return { repositoryId: repo.id, issueCount: issues.length };
+  // Return the *canonical* fullName (GitHub may have redirected a moved repo),
+  // so the caller chains scoring against the name actually stored.
+  return { repositoryId: repo.id, fullName: repo.fullName, issueCount: issues.length };
 }

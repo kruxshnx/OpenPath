@@ -22,12 +22,12 @@ const worker = new Worker(
       const { fullName } = job.data as { fullName: string };
       const result = await ingestRepository(fullName);
       console.log(
-        `[worker] ingested ${fullName}: repo ${result.repositoryId}, ${result.issueCount} issues`,
+        `[worker] ingested ${result.fullName}: repo ${result.repositoryId}, ${result.issueCount} issues`,
       );
-      // Chain: score the repo immediately after ingesting it.
+      // Chain scoring on the canonical name (GitHub may have redirected a move).
       await queue.add(
         'score-repo',
-        { fullName },
+        { fullName: result.fullName },
         { attempts: 3, backoff: { type: 'exponential', delay: 5000 } },
       );
       return result;
