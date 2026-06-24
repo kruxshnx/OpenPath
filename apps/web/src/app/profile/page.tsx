@@ -53,7 +53,7 @@ export default async function ProfilePage() {
     return (
       <main className="container py-10">
         <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
-        <p className="mt-4 rounded-xl border border-dashed border-border bg-card/50 p-6 text-sm text-muted-foreground">
+        <p className="glass mt-4 rounded-2xl p-6 text-sm text-muted-foreground">
           Couldn&apos;t load your profile from the API (is the database up?).
         </p>
       </main>
@@ -88,7 +88,7 @@ export default async function ProfilePage() {
                   defaultChecked={me.experienceLevel === lvl}
                   className="peer sr-only"
                 />
-                <span className="inline-flex rounded-md border border-border bg-card px-4 py-2 text-sm transition-colors peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary hover:bg-muted">
+                <span className="glass inline-flex rounded-xl px-4 py-2 text-sm transition-colors peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-primary hover:bg-card/80">
                   {lvl}
                 </span>
               </label>
@@ -165,7 +165,7 @@ function Chip({
         defaultChecked={checked}
         className="peer sr-only"
       />
-      <span className="inline-flex rounded-full border border-border bg-card px-3 py-1.5 text-sm transition-colors peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary hover:bg-muted">
+      <span className="glass inline-flex rounded-full px-3 py-1.5 text-sm transition-colors peer-checked:border-primary peer-checked:bg-primary/15 peer-checked:text-primary hover:bg-card/80">
         {value}
       </span>
     </label>

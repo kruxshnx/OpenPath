@@ -34,19 +34,19 @@ export default async function RepositoriesPage({
               name="language"
               defaultValue={language ?? ''}
               placeholder="Language…"
-              className="h-9 w-40 rounded-md border border-border bg-card pl-8 pr-3 text-sm outline-none ring-ring focus:ring-2"
+              className="glass h-9 w-40 rounded-xl pl-8 pr-3 text-sm outline-none ring-ring focus:ring-2"
             />
           </div>
           <select
             name="sort"
             defaultValue={sort ?? 'health'}
-            className="h-9 rounded-md border border-border bg-card px-3 text-sm outline-none ring-ring focus:ring-2"
+            className="glass h-9 rounded-xl px-3 text-sm outline-none ring-ring focus:ring-2"
           >
             <option value="health">Health</option>
             <option value="stars">Stars</option>
             <option value="recent">Recently pushed</option>
           </select>
-          <button className="h-9 rounded-md border border-border bg-card px-3 text-sm transition-colors hover:bg-muted">
+          <button className="glass h-9 rounded-xl px-4 text-sm transition-colors hover:bg-card/80">
             Apply
           </button>
         </form>
@@ -60,7 +60,7 @@ export default async function RepositoriesPage({
             <Link
               key={r.id}
               href={`/repositories/${r.fullName}`}
-              className="group flex flex-col rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40"
+              className="glass group flex flex-col rounded-2xl p-4 transition-transform hover:-translate-y-0.5"
             >
               <div className="flex items-start justify-between gap-3">
                 <span className="font-mono text-sm font-medium text-foreground group-hover:text-primary">
@@ -101,7 +101,7 @@ export default async function RepositoriesPage({
 
 function EmptyState() {
   return (
-    <div className="mt-6 flex flex-col items-center rounded-xl border border-dashed border-border bg-card/50 p-12 text-center">
+    <div className="glass mt-6 flex flex-col items-center rounded-2xl p-12 text-center">
       <PackageOpen className="h-8 w-8 text-muted-foreground" />
       <p className="mt-3 font-medium">No repositories yet</p>
       <p className="mt-1 max-w-md text-sm text-muted-foreground">

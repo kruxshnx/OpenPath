@@ -4,31 +4,31 @@
 
 @layer base {
   :root {
-    --background: 210 40% 99%;
+    --background: 220 48% 97%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 215 30% 92%;
+    --muted-foreground: 215 16% 42%;
     --primary: 243 75% 59%;
     --primary-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --border: 215 25% 80%;
+    --input: 214 32% 88%;
     --ring: 243 75% 59%;
-    --radius: 0.75rem;
+    --radius: 1rem;
   }
 
   .dark {
     --background: 224 47% 5%;
     --foreground: 213 31% 95%;
-    --card: 222 44% 8%;
+    --card: 222 44% 11%;
     --card-foreground: 213 31% 95%;
-    --muted: 217 33% 15%;
-    --muted-foreground: 217 18% 62%;
+    --muted: 217 33% 18%;
+    --muted-foreground: 217 18% 65%;
     --primary: 239 84% 71%;
     --primary-foreground: 222 47% 8%;
-    --border: 217 33% 17%;
-    --input: 217 33% 20%;
+    --border: 217 33% 24%;
+    --input: 217 33% 22%;
     --ring: 239 84% 71%;
   }
 
@@ -43,13 +43,32 @@
   }
 }
 
-@layer utilities {
-  /* Subtle page-background glow used on the landing hero. */
-  .bg-grid-glow {
-    background-image: radial-gradient(
-      60% 50% at 50% 0%,
-      hsl(var(--primary) / 0.12),
-      transparent 70%
-    );
+@layer components {
+  /* Frosted-glass surface (glassmorphism). Translucent so the vibrant page
+     backdrop blurs through; tuned per theme for 4.5:1 text contrast. */
+  .glass {
+    background-color: hsl(var(--card) / 0.62);
+    border: 1px solid hsl(var(--border) / 0.55);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    box-shadow:
+      0 8px 32px -12px hsl(222 47% 20% / 0.18),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.4);
+  }
+
+  .dark .glass {
+    background-color: hsl(var(--card) / 0.5);
+    border-color: hsl(0 0% 100% / 0.08);
+    box-shadow:
+      0 8px 32px -12px hsl(0 0% 0% / 0.55),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.06);
+  }
+
+  /* Lighter glass for sticky nav. */
+  .glass-nav {
+    background-color: hsl(var(--background) / 0.65);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border-bottom: 1px solid hsl(var(--border) / 0.5);
   }
 }

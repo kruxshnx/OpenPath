@@ -37,6 +37,15 @@ export default function RootLayout({
     >
       <body className="font-sans">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          {/* Vibrant backdrop the frosted-glass surfaces blur through. */}
+          <div
+            aria-hidden
+            className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+          >
+            <div className="absolute -left-40 -top-40 h-[26rem] w-[26rem] rounded-full bg-indigo-500/25 blur-3xl dark:bg-indigo-500/30" />
+            <div className="absolute -right-40 top-1/4 h-[24rem] w-[24rem] rounded-full bg-fuchsia-500/15 blur-3xl dark:bg-fuchsia-600/25" />
+            <div className="absolute bottom-0 left-1/3 h-[24rem] w-[24rem] rounded-full bg-sky-400/15 blur-3xl dark:bg-sky-500/20" />
+          </div>
           <Nav />
           {children}
           <footer className="mt-20 border-t border-border">

@@ -1,11 +1,5 @@
 import Link from 'next/link';
-import {
-  Activity,
-  ArrowRight,
-  Gauge,
-  Sparkles,
-  Target,
-} from 'lucide-react';
+import { Activity, ArrowRight, Gauge, Sparkles, Target } from 'lucide-react';
 import { apiGet } from '@/lib/api';
 
 export default async function Home() {
@@ -13,9 +7,9 @@ export default async function Home() {
 
   return (
     <main>
-      <section className="bg-grid-glow">
+      <section>
         <div className="container flex flex-col items-center gap-6 py-24 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+          <span className="glass inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs text-muted-foreground">
             <span
               className={`h-1.5 w-1.5 rounded-full ${health ? 'bg-emerald-500' : 'bg-red-500'}`}
             />
@@ -34,14 +28,14 @@ export default async function Home() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/repositories"
-              className="inline-flex h-11 items-center gap-2 rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition-opacity hover:opacity-90"
             >
               Browse repositories
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/recommendations"
-              className="inline-flex h-11 items-center rounded-md border border-border bg-card px-6 text-sm font-medium transition-colors hover:bg-muted"
+              className="glass inline-flex h-11 items-center rounded-xl px-6 text-sm font-medium transition-colors hover:bg-card/80"
             >
               My recommendations
             </Link>
@@ -69,9 +63,9 @@ export default async function Home() {
         ].map((c) => (
           <div
             key={c.title}
-            className="rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/40"
+            className="glass rounded-2xl p-5 transition-transform hover:-translate-y-0.5"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
               {c.icon}
             </div>
             <h3 className="mt-4 font-semibold">{c.title}</h3>
@@ -81,7 +75,7 @@ export default async function Home() {
       </section>
 
       <section className="container pb-4">
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+        <div className="glass flex items-center gap-3 rounded-2xl p-4 text-sm text-muted-foreground">
           <Sparkles className="h-4 w-4 shrink-0 text-primary" />
           <span>
             New here? Sign in with GitHub, set your skills on the Profile page,

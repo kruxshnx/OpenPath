@@ -69,7 +69,11 @@ export async function generateRecommendations(userId: string, limit = 20) {
         repositoryId: rec.id,
         skillMatchScore: rec.skillMatch.score,
         compositeScore: rec.compositeScore,
-        scoreBreakdown: rec.factors as unknown as Prisma.InputJsonValue,
+        scoreBreakdown: {
+          factors: rec.factors,
+          matchedSkills: rec.skillMatch.matched,
+          suitableIssues: rec.issueFit.suitableCount,
+        } as unknown as Prisma.InputJsonValue,
       })),
     });
   }

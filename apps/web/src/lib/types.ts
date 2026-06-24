@@ -39,10 +39,12 @@ export interface RepoDetail extends RepoListItem {
   issues: IssueDto[];
 }
 
+// scoreBreakdown is { factors, matchedSkills, suitableIssues } for freshly
+// generated recs; older rows stored the flat factors object — handled in the UI.
 export interface RecommendationDto {
   compositeScore: number;
   skillMatchScore: number;
-  scoreBreakdown: Record<string, number> | null;
+  scoreBreakdown: Record<string, unknown> | null;
   generatedAt: string;
   repository: RepoListItem;
 }
