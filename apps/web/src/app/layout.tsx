@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Nav } from '@/components/Nav';
 
 export const metadata: Metadata = {
   title: 'OpenPath',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-white text-gray-900 antialiased">{children}</body>
+      <body className="bg-white text-gray-900 antialiased">
+        <Nav />
+        {children}
+      </body>
     </html>
   );
 }

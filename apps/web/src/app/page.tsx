@@ -1,100 +1,72 @@
-import { auth, signIn, signOut } from '@/auth';
-
-const API_URL = process.env.API_URL ?? 'http://localhost:4000';
-
-async function getApiHealth() {
-  try {
-    const res = await fetch(`${API_URL}/api/health`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    return (await res.json()) as { status: string; service: string };
-  } catch {
-    return null;
-  }
-}
-
-async function getMe(apiToken?: string) {
-  if (!apiToken) return null;
-  try {
-    const res = await fetch(`${API_URL}/api/users/me`, {
-      headers: { Authorization: `Bearer ${apiToken}` },
-      cache: 'no-store',
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as { login: string; name: string | null };
-  } catch {
-    return null;
-  }
-}
+import Link from 'next/link';
+import { apiGet } from '@/lib/api';
 
 export default async function Home() {
-  const [health, session] = await Promise.all([getApiHealth(), auth()]);
-  const me = await getMe(session?.apiToken);
+  const health = await apiGet<{ status: string; service: string }>('/health');
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-6">
-      <h1 className="text-4xl font-bold tracking-tight">OpenPath</h1>
-      <p className="text-lg text-gray-600">
-        Intelligent open-source contribution discovery &amp; recommendation.
-      </p>
+    <main className="mx-auto max-w-5xl px-6 py-16">
+      <section className="flex flex-col gap-6">
+        <h1 className="text-4xl font-bold tracking-tight">
+          Find the right open-source project to contribute to.
+        </h1>
+        <p className="max-w-2xl text-lg text-gray-600">
+          OpenPath analyzes repository health, issue difficulty, and how well a
+          project matches your skills — then recommends where you&apos;re most
+          likely to land a successful first contribution.
+        </p>
 
-      <div className="rounded-lg border border-gray-200 p-4 text-sm">
-        <span className="font-medium">API status: </span>
-        {health ? (
-          <span className="text-green-600">
-            {health.status} ({health.service})
-          </span>
-        ) : (
-          <span className="text-red-600">
-            unreachable — start the API with <code>npm run dev:api</code>
-          </span>
-        )}
-      </div>
-
-      <div className="rounded-lg border border-gray-200 p-4">
-        {session?.user ? (
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              {session.user.image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={session.user.image}
-                  alt=""
-                  className="h-10 w-10 rounded-full"
-                />
-              )}
-              <div>
-                <div className="font-medium">{session.user.name}</div>
-                <div className="text-sm text-gray-500">
-                  {me
-                    ? `synced to API as @${me.login}`
-                    : 'signed in (API user not synced — is the DB up?)'}
-                </div>
-              </div>
-            </div>
-            <form
-              action={async () => {
-                'use server';
-                await signOut();
-              }}
-            >
-              <button className="rounded-md border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50">
-                Sign out
-              </button>
-            </form>
-          </div>
-        ) : (
-          <form
-            action={async () => {
-              'use server';
-              await signIn('github');
-            }}
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/repositories"
+            className="rounded-md bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700"
           >
-            <button className="rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700">
-              Sign in with GitHub
-            </button>
-          </form>
-        )}
-      </div>
+            Browse repositories
+          </Link>
+          <Link
+            href="/recommendations"
+            className="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium hover:bg-gray-50"
+          >
+            My recommendations
+          </Link>
+        </div>
+
+        <div className="mt-4 text-sm">
+          <span className="font-medium">API status: </span>
+          {health ? (
+            <span className="text-green-600">
+              {health.status} ({health.service})
+            </span>
+          ) : (
+            <span className="text-red-600">
+              unreachable — start it with <code>npm run dev:api</code> (and a
+              database)
+            </span>
+          )}
+        </div>
+      </section>
+
+      <section className="mt-16 grid gap-6 sm:grid-cols-3">
+        {[
+          {
+            title: 'Repository health',
+            body: 'Activity, popularity, maintainer responsiveness, and issue management distilled into one score.',
+          },
+          {
+            title: 'Issue difficulty',
+            body: 'Every issue rated Beginner → Advanced with an effort estimate, beyond just labels.',
+          },
+          {
+            title: 'Skill-matched',
+            body: 'Recommendations ranked by how well a project fits your languages, frameworks, and interests.',
+          },
+        ].map((c) => (
+          <div key={c.title} className="rounded-lg border border-gray-200 p-5">
+            <h3 className="font-semibold">{c.title}</h3>
+            <p className="mt-2 text-sm text-gray-600">{c.body}</p>
+          </div>
+        ))}
+      </section>
     </main>
   );
 }
