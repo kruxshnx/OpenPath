@@ -4,6 +4,7 @@ import { Queue, Worker, QueueEvents } from 'bullmq';
 import { INGESTION_QUEUE, redisConnection } from './redis';
 import { ingestRepository } from './ingestion';
 import { scoreRepository } from './scoring/score-repository';
+import { generateRecommendations } from './recommendation/generate';
 
 // Load the repo-root .env (npm runs workspace scripts with cwd = apps/worker).
 config({ path: resolve(process.cwd(), '../../.env') });
@@ -37,6 +38,15 @@ const worker = new Worker(
       const result = await scoreRepository(fullName);
       console.log(
         `[worker] scored ${fullName}: health ${result.health.score} (${result.health.rating}), ${result.scoredIssues} issues`,
+      );
+      return result;
+    }
+
+    if (job.name === 'recommend-user') {
+      const { userId } = job.data as { userId: string };
+      const result = await generateRecommendations(userId);
+      console.log(
+        `[worker] generated ${result.count} recommendations for user ${userId}`,
       );
       return result;
     }

@@ -8,8 +8,10 @@
     "start": "node dist/main.js",
     "preview": "tsx src/ingestion/preview.ts",
     "score-preview": "tsx src/scoring/score-preview.ts",
+    "recommend-preview": "tsx src/recommendation/recommend-preview.ts",
     "enqueue": "tsx src/enqueue.ts",
-    "score": "tsx src/score.ts"
+    "score": "tsx src/score.ts",
+    "recommend": "tsx src/recommend.ts"
   },
   "dependencies": {
     "@openpath/db": "*",

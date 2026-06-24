@@ -15,6 +15,14 @@ const BASE_WEIGHTS = {
 
 type Component = keyof typeof BASE_WEIGHTS;
 
+// Log-scaled popularity from stars (with a small forks contribution). Exported
+// so the recommendation engine reuses the exact same definition.
+export function popularityScore(stars: number, forks: number): number {
+  const starScore = (Math.log10(stars + 1) / Math.log10(100000)) * 100;
+  const forkScore = (Math.log10(forks + 1) / Math.log10(50000)) * 100;
+  return round(clamp(0.8 * starScore + 0.2 * forkScore));
+}
+
 export function computeHealth(s: RepoHealthSignals): HealthResult {
   const notes: string[] = [];
 
@@ -28,9 +36,7 @@ export function computeHealth(s: RepoHealthSignals): HealthResult {
   }
 
   // Popularity: log-scaled stars with a small forks contribution (always present).
-  const starScore = (Math.log10(s.stars + 1) / Math.log10(100000)) * 100;
-  const forkScore = (Math.log10(s.forks + 1) / Math.log10(50000)) * 100;
-  const popularity = round(clamp(0.8 * starScore + 0.2 * forkScore));
+  const popularity = popularityScore(s.stars, s.forks);
 
   // Responsiveness: decay on median issue resolution time (1 week ~ 37).
   let responsiveness: number | null = null;
