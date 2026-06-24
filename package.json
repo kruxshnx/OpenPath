@@ -18,6 +18,7 @@
     "db:generate": "npm run generate -w @openpath/db",
     "db:build": "npm run build -w @openpath/db",
     "db:migrate": "npm run migrate -w @openpath/db",
+    "db:seed": "npm run seed -w @openpath/db",
     "db:studio": "npm run studio -w @openpath/db",
     "lint": "npm run lint --workspaces --if-present"
   }

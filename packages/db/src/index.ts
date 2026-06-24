@@ -1,4 +1,5 @@
 export * from '@prisma/client';
+export * from './skills.catalog';
 import { PrismaClient } from '@prisma/client';
 
 // Singleton PrismaClient shared across the app and workers. Avoids exhausting
