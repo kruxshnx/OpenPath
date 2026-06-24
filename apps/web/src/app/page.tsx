@@ -1,71 +1,93 @@
 import Link from 'next/link';
+import {
+  Activity,
+  ArrowRight,
+  Gauge,
+  Sparkles,
+  Target,
+} from 'lucide-react';
 import { apiGet } from '@/lib/api';
 
 export default async function Home() {
   const health = await apiGet<{ status: string; service: string }>('/health');
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <section className="flex flex-col gap-6">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Find the right open-source project to contribute to.
-        </h1>
-        <p className="max-w-2xl text-lg text-gray-600">
-          OpenPath analyzes repository health, issue difficulty, and how well a
-          project matches your skills — then recommends where you&apos;re most
-          likely to land a successful first contribution.
-        </p>
+    <main>
+      <section className="bg-grid-glow">
+        <div className="container flex flex-col items-center gap-6 py-24 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${health ? 'bg-emerald-500' : 'bg-red-500'}`}
+            />
+            {health ? 'API online' : 'API offline'}
+          </span>
 
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/repositories"
-            className="rounded-md bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700"
-          >
-            Browse repositories
-          </Link>
-          <Link
-            href="/recommendations"
-            className="rounded-md border border-gray-300 px-5 py-2.5 text-sm font-medium hover:bg-gray-50"
-          >
-            My recommendations
-          </Link>
-        </div>
+          <h1 className="max-w-3xl text-balance text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+            Find the right open-source project to contribute to.
+          </h1>
+          <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
+            OpenPath analyzes repository health, estimates issue difficulty, and
+            matches projects to your skills — so your next contribution actually
+            lands.
+          </p>
 
-        <div className="mt-4 text-sm">
-          <span className="font-medium">API status: </span>
-          {health ? (
-            <span className="text-green-600">
-              {health.status} ({health.service})
-            </span>
-          ) : (
-            <span className="text-red-600">
-              unreachable — start it with <code>npm run dev:api</code> (and a
-              database)
-            </span>
-          )}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/repositories"
+              className="inline-flex h-11 items-center gap-2 rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              Browse repositories
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/recommendations"
+              className="inline-flex h-11 items-center rounded-md border border-border bg-card px-6 text-sm font-medium transition-colors hover:bg-muted"
+            >
+              My recommendations
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="mt-16 grid gap-6 sm:grid-cols-3">
+      <section className="container grid gap-4 pb-8 sm:grid-cols-3">
         {[
           {
+            icon: <Gauge className="h-5 w-5" />,
             title: 'Repository health',
             body: 'Activity, popularity, maintainer responsiveness, and issue management distilled into one score.',
           },
           {
+            icon: <Activity className="h-5 w-5" />,
             title: 'Issue difficulty',
-            body: 'Every issue rated Beginner → Advanced with an effort estimate, beyond just labels.',
+            body: 'Every issue rated Beginner → Advanced with an effort estimate — well beyond GitHub labels.',
           },
           {
+            icon: <Target className="h-5 w-5" />,
             title: 'Skill-matched',
             body: 'Recommendations ranked by how well a project fits your languages, frameworks, and interests.',
           },
         ].map((c) => (
-          <div key={c.title} className="rounded-lg border border-gray-200 p-5">
-            <h3 className="font-semibold">{c.title}</h3>
-            <p className="mt-2 text-sm text-gray-600">{c.body}</p>
+          <div
+            key={c.title}
+            className="rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/40"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              {c.icon}
+            </div>
+            <h3 className="mt-4 font-semibold">{c.title}</h3>
+            <p className="mt-1.5 text-sm text-muted-foreground">{c.body}</p>
           </div>
         ))}
+      </section>
+
+      <section className="container pb-4">
+        <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+          <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+          <span>
+            New here? Sign in with GitHub, set your skills on the Profile page,
+            and hit Refresh on Recommendations.
+          </span>
+        </div>
       </section>
     </main>
   );

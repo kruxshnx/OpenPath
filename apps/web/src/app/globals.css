@@ -1,3 +1,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 99%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --primary: 243 75% 59%;
+    --primary-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 243 75% 59%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 224 47% 5%;
+    --foreground: 213 31% 95%;
+    --card: 222 44% 8%;
+    --card-foreground: 213 31% 95%;
+    --muted: 217 33% 15%;
+    --muted-foreground: 217 18% 62%;
+    --primary: 239 84% 71%;
+    --primary-foreground: 222 47% 8%;
+    --border: 217 33% 17%;
+    --input: 217 33% 20%;
+    --ring: 239 84% 71%;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer utilities {
+  /* Subtle page-background glow used on the landing hero. */
+  .bg-grid-glow {
+    background-image: radial-gradient(
+      60% 50% at 50% 0%,
+      hsl(var(--primary) / 0.12),
+      transparent 70%
+    );
+  }
+}

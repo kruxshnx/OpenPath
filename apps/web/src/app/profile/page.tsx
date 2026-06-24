@@ -1,32 +1,20 @@
 import { revalidatePath } from 'next/cache';
+import { UserRound } from 'lucide-react';
 import { auth, signIn } from '@/auth';
 import { apiGet, API_URL } from '@/lib/api';
 import type { Me, SkillDto } from '@/lib/types';
 
 const EXPERIENCE_LEVELS = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
 
+const TYPE_LABEL: Record<string, string> = {
+  LANGUAGE: 'Languages',
+  FRAMEWORK: 'Frameworks',
+  TOOL: 'Tools',
+};
+
 export default async function ProfilePage() {
   const session = await auth();
-
-  if (!session?.user) {
-    return (
-      <main className="mx-auto max-w-3xl px-6 py-16 text-center">
-        <h1 className="text-2xl font-bold">Profile</h1>
-        <p className="mt-2 text-gray-600">Sign in to set up your profile.</p>
-        <form
-          action={async () => {
-            'use server';
-            await signIn('github');
-          }}
-          className="mt-6"
-        >
-          <button className="rounded-md bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700">
-            Sign in with GitHub
-          </button>
-        </form>
-      </main>
-    );
-  }
+  if (!session?.user) return <SignInGate />;
 
   const [me, skills] = await Promise.all([
     apiGet<Me>('/users/me', session.apiToken),
@@ -35,7 +23,10 @@ export default async function ProfilePage() {
 
   const allSkills = skills ?? [];
   const domains = allSkills.filter((s) => s.type === 'DOMAIN');
-  const techSkills = allSkills.filter((s) => s.type !== 'DOMAIN');
+  const techByType = (['LANGUAGE', 'FRAMEWORK', 'TOOL'] as const).map((t) => ({
+    type: t,
+    items: allSkills.filter((s) => s.type === t),
+  }));
   const mySkillNames = new Set(me?.skills?.map((s) => s.name) ?? []);
   const myInterests = new Set(me?.interests ?? []);
 
@@ -60,9 +51,9 @@ export default async function ProfilePage() {
 
   if (!me) {
     return (
-      <main className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="text-2xl font-bold">Profile</h1>
-        <p className="mt-4 rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-500">
+      <main className="container py-10">
+        <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
+        <p className="mt-4 rounded-xl border border-dashed border-border bg-card/50 p-6 text-sm text-muted-foreground">
           Couldn&apos;t load your profile from the API (is the database up?).
         </p>
       </main>
@@ -70,64 +61,136 @@ export default async function ProfilePage() {
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-10">
-      <h1 className="text-2xl font-bold">Profile</h1>
-      <p className="mt-1 text-sm text-gray-500">
-        Signed in as @{me.login}. Your skills drive recommendations.
-      </p>
+    <main className="container max-w-3xl py-10">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <UserRound className="h-5 w-5" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
+          <p className="text-sm text-muted-foreground">
+            Signed in as{' '}
+            <span className="font-mono text-foreground">@{me.login}</span> — your
+            skills drive recommendations.
+          </p>
+        </div>
+      </div>
 
       <form action={save} className="mt-8 space-y-8">
-        <div>
-          <label className="block text-sm font-semibold">Experience level</label>
-          <select
-            name="experienceLevel"
-            defaultValue={me.experienceLevel}
-            className="mt-2 rounded-md border border-gray-300 px-3 py-2 text-sm"
-          >
+        <Section title="Experience level">
+          <div className="flex flex-wrap gap-2">
             {EXPERIENCE_LEVELS.map((lvl) => (
-              <option key={lvl} value={lvl}>
-                {lvl}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <fieldset>
-          <legend className="text-sm font-semibold">Interests</legend>
-          <div className="mt-2 flex flex-wrap gap-3">
-            {domains.map((d) => (
-              <label key={d.id} className="flex items-center gap-2 text-sm">
+              <label key={lvl} className="cursor-pointer">
                 <input
-                  type="checkbox"
-                  name="interests"
-                  value={d.name}
-                  defaultChecked={myInterests.has(d.name)}
+                  type="radio"
+                  name="experienceLevel"
+                  value={lvl}
+                  defaultChecked={me.experienceLevel === lvl}
+                  className="peer sr-only"
                 />
-                {d.name}
+                <span className="inline-flex rounded-md border border-border bg-card px-4 py-2 text-sm transition-colors peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary hover:bg-muted">
+                  {lvl}
+                </span>
               </label>
             ))}
           </div>
-        </fieldset>
+        </Section>
 
-        <fieldset>
-          <legend className="text-sm font-semibold">Skills</legend>
-          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {techSkills.map((s) => (
-              <label key={s.id} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
+        <Section title="Interests">
+          <div className="flex flex-wrap gap-2">
+            {domains.map((d) => (
+              <Chip
+                key={d.id}
+                name="interests"
+                value={d.name}
+                checked={myInterests.has(d.name)}
+              />
+            ))}
+          </div>
+        </Section>
+
+        {techByType.map(({ type, items }) => (
+          <Section key={type} title={TYPE_LABEL[type]}>
+            <div className="flex flex-wrap gap-2">
+              {items.map((s) => (
+                <Chip
+                  key={s.id}
                   name="skills"
                   value={s.name}
-                  defaultChecked={mySkillNames.has(s.name)}
+                  checked={mySkillNames.has(s.name)}
                 />
-                {s.name}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+              ))}
+            </div>
+          </Section>
+        ))}
 
-        <button className="rounded-md bg-gray-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-gray-700">
+        <button className="inline-flex h-11 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90">
           Save profile
+        </button>
+      </form>
+    </main>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <fieldset>
+      <legend className="mb-3 text-sm font-semibold">{title}</legend>
+      {children}
+    </fieldset>
+  );
+}
+
+function Chip({
+  name,
+  value,
+  checked,
+}: {
+  name: string;
+  value: string;
+  checked: boolean;
+}) {
+  return (
+    <label className="cursor-pointer">
+      <input
+        type="checkbox"
+        name={name}
+        value={value}
+        defaultChecked={checked}
+        className="peer sr-only"
+      />
+      <span className="inline-flex rounded-full border border-border bg-card px-3 py-1.5 text-sm transition-colors peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary hover:bg-muted">
+        {value}
+      </span>
+    </label>
+  );
+}
+
+function SignInGate() {
+  return (
+    <main className="container flex flex-col items-center py-24 text-center">
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <UserRound className="h-6 w-6" />
+      </div>
+      <h1 className="mt-4 text-2xl font-bold tracking-tight">Profile</h1>
+      <p className="mt-2 max-w-sm text-muted-foreground">
+        Sign in to set up your skills and experience level.
+      </p>
+      <form
+        action={async () => {
+          'use server';
+          await signIn('github');
+        }}
+        className="mt-6"
+      >
+        <button className="inline-flex h-11 items-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90">
+          Sign in with GitHub
         </button>
       </form>
     </main>
