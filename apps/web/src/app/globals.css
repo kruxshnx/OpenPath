@@ -8,14 +8,22 @@
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    --muted: 215 30% 92%;
-    --muted-foreground: 215 16% 42%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
     --primary: 243 75% 59%;
     --primary-foreground: 0 0% 100%;
+    --secondary: 215 28% 93%;
+    --secondary-foreground: 222 47% 18%;
+    --muted: 215 30% 92%;
+    --muted-foreground: 215 16% 42%;
+    --accent: 215 28% 93%;
+    --accent-foreground: 222 47% 18%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
     --border: 215 25% 80%;
     --input: 214 32% 88%;
     --ring: 243 75% 59%;
-    --radius: 1rem;
+    --radius: 0.75rem;
   }
 
   .dark {
@@ -23,10 +31,18 @@
     --foreground: 213 31% 95%;
     --card: 222 44% 11%;
     --card-foreground: 213 31% 95%;
-    --muted: 217 33% 18%;
-    --muted-foreground: 217 18% 65%;
+    --popover: 222 44% 11%;
+    --popover-foreground: 213 31% 95%;
     --primary: 239 84% 71%;
     --primary-foreground: 222 47% 8%;
+    --secondary: 217 33% 20%;
+    --secondary-foreground: 213 31% 95%;
+    --muted: 217 33% 18%;
+    --muted-foreground: 217 18% 65%;
+    --accent: 217 33% 22%;
+    --accent-foreground: 213 31% 95%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
     --border: 217 33% 24%;
     --input: 217 33% 22%;
     --ring: 239 84% 71%;
@@ -64,7 +80,7 @@
       inset 0 1px 0 0 hsl(0 0% 100% / 0.06);
   }
 
-  /* Lighter glass for sticky nav. */
+  /* Lighter glass for the sticky nav. */
   .glass-nav {
     background-color: hsl(var(--background) / 0.65);
     backdrop-filter: blur(14px) saturate(160%);

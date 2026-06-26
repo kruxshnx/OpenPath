@@ -21,5 +21,8 @@
     "db:seed": "npm run seed -w @openpath/db",
     "db:studio": "npm run studio -w @openpath/db",
     "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "shadcn": "^4.11.1"
   }
 }

@@ -2,6 +2,9 @@ import Link from 'next/link';
 import { ArrowLeft, CircleDot, ExternalLink, Github, GitFork, Star } from 'lucide-react';
 import { apiGet } from '@/lib/api';
 import type { RepoDetail } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { HealthRing } from '@/components/HealthRing';
 import { DifficultyChip } from '@/components/DifficultyChip';
 
@@ -24,12 +27,12 @@ export default async function RepositoryDetailPage({
     return (
       <main className="container py-10">
         <BackLink />
-        <div className="glass mt-6 rounded-2xl p-12 text-center text-muted-foreground">
+        <Card className="mt-6 p-12 text-center text-muted-foreground">
           <p className="font-medium text-foreground">
             {owner}/{name} isn&apos;t in OpenPath yet
           </p>
           <p className="mt-1 text-sm">Ingest it, then refresh this page.</p>
-        </div>
+        </Card>
       </main>
     );
   }
@@ -42,10 +45,10 @@ export default async function RepositoryDetailPage({
     <main className="container py-10">
       <BackLink />
 
-      <div className="glass mt-4 flex flex-col gap-6 rounded-2xl p-6 sm:flex-row sm:items-center">
+      <Card className="mt-4 flex flex-col gap-6 p-6 sm:flex-row sm:items-center">
         <HealthRing score={repo.healthScore} rating={repo.healthRating} size={92} />
         <div className="min-w-0 flex-1">
-          <h1 className="font-mono text-xl font-bold tracking-tight">
+          <h1 className="font-mono text-xl font-bold tracking-tight break-words">
             {repo.fullName}
           </h1>
           {repo.description && (
@@ -72,15 +75,12 @@ export default async function RepositoryDetailPage({
             </span>
           </div>
         </div>
-        <a
-          href={ghUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex h-10 shrink-0 items-center gap-2 self-start rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition-opacity hover:opacity-90 sm:self-center"
-        >
-          <Github className="h-4 w-4" /> View on GitHub
-        </a>
-      </div>
+        <Button asChild className="w-full shrink-0 sm:w-auto">
+          <a href={ghUrl} target="_blank" rel="noopener noreferrer">
+            <Github className="h-4 w-4" /> View on GitHub
+          </a>
+        </Button>
+      </Card>
 
       {repo.healthBreakdown && (
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -88,7 +88,7 @@ export default async function RepositoryDetailPage({
             const v = breakdown[key];
             const num = typeof v === 'number' ? v : null;
             return (
-              <div key={key} className="glass rounded-2xl p-4">
+              <Card key={key} className="p-4">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">
                   {label}
                 </div>
@@ -101,7 +101,7 @@ export default async function RepositoryDetailPage({
                     style={{ width: `${num ?? 0}%` }}
                   />
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
@@ -110,15 +110,12 @@ export default async function RepositoryDetailPage({
       {repo.languages.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {repo.languages.slice(0, 8).map((l) => (
-            <span
-              key={l.language}
-              className="glass rounded-lg px-2.5 py-1 text-xs text-muted-foreground"
-            >
-              {l.language}{' '}
-              <span className="font-mono text-foreground">
+            <Badge key={l.language} variant="secondary" className="font-normal">
+              {l.language}
+              <span className="ml-1 font-mono text-muted-foreground">
                 {Math.round((l.bytes / totalBytes) * 100)}%
               </span>
-            </span>
+            </Badge>
           ))}
         </div>
       )}
@@ -131,48 +128,47 @@ export default async function RepositoryDetailPage({
           </span>
         </h2>
         {repo.issues.length === 0 ? (
-          <p className="glass mt-3 rounded-2xl p-6 text-sm text-muted-foreground">
+          <Card className="mt-3 p-6 text-sm text-muted-foreground">
             No issues ingested (this repo may track issues elsewhere).
-          </p>
+          </Card>
         ) : (
-          <ul className="glass mt-3 divide-y divide-border/60 overflow-hidden rounded-2xl">
+          <Card className="mt-3 divide-y divide-border/60 overflow-hidden p-0">
             {repo.issues.map((i) => (
-              <li key={i.number}>
-                <a
-                  href={`${ghUrl}/issues/${i.number}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start justify-between gap-4 p-4 transition-colors hover:bg-card/60"
-                >
-                  <div className="min-w-0">
-                    <div className="text-sm">
-                      <span className="font-mono text-muted-foreground">
-                        #{i.number}
-                      </span>{' '}
-                      {i.title}
-                      <ExternalLink className="ml-1 inline h-3 w-3 align-baseline text-muted-foreground" />
-                    </div>
-                    {i.labels.length > 0 && (
-                      <div className="mt-1.5 flex flex-wrap gap-1">
-                        {i.labels.slice(0, 5).map((l) => (
-                          <span
-                            key={l}
-                            className="rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground"
-                          >
-                            {l}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+              <a
+                key={i.number}
+                href={`${ghUrl}/issues/${i.number}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start justify-between gap-4 p-4 transition-colors hover:bg-accent/50"
+              >
+                <div className="min-w-0">
+                  <div className="text-sm">
+                    <span className="font-mono text-muted-foreground">
+                      #{i.number}
+                    </span>{' '}
+                    {i.title}
+                    <ExternalLink className="ml-1 inline h-3 w-3 align-baseline text-muted-foreground" />
                   </div>
-                  <DifficultyChip
-                    level={i.difficultyLevel}
-                    eta={i.estimatedTimeBucket}
-                  />
-                </a>
-              </li>
+                  {i.labels.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {i.labels.slice(0, 5).map((l) => (
+                        <span
+                          key={l}
+                          className="rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground"
+                        >
+                          {l}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <DifficultyChip
+                  level={i.difficultyLevel}
+                  eta={i.estimatedTimeBucket}
+                />
+              </a>
             ))}
-          </ul>
+          </Card>
         )}
       </section>
     </main>

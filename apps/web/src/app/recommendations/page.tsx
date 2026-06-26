@@ -1,16 +1,12 @@
 import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
-import {
-  CircleDot,
-  ExternalLink,
-  Github,
-  RefreshCw,
-  Sparkles,
-  Star,
-} from 'lucide-react';
+import { CircleDot, Github, RefreshCw, Sparkles, Star } from 'lucide-react';
 import { auth, signIn } from '@/auth';
 import { apiGet, API_URL } from '@/lib/api';
 import type { RecommendationDto } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { HealthBadge } from '@/components/HealthBadge';
 import { FactorBars } from '@/components/FactorBars';
 import { TypographyH1 } from '@/components/ui/typography';
@@ -36,7 +32,7 @@ export default async function RecommendationsPage() {
 
   return (
     <main className="container py-10">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <TypographyH1 className="text-3xl">Your recommendations</TypographyH1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -44,14 +40,14 @@ export default async function RecommendationsPage() {
           </p>
         </div>
         <form action={refresh}>
-          <button className="glass inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm transition-colors hover:bg-card/80">
+          <Button variant="outline" size="sm">
             <RefreshCw className="h-4 w-4" /> Refresh
-          </button>
+          </Button>
         </form>
       </div>
 
       {recs.length === 0 ? (
-        <div className="glass mt-6 flex flex-col items-center rounded-2xl p-12 text-center">
+        <Card className="mt-6 flex flex-col items-center p-12 text-center">
           <Sparkles className="h-8 w-8 text-muted-foreground" />
           <p className="mt-3 font-medium">No recommendations yet</p>
           <p className="mt-1 max-w-md text-sm text-muted-foreground">
@@ -61,12 +57,11 @@ export default async function RecommendationsPage() {
             </Link>{' '}
             page, make sure repositories are ingested, then click Refresh.
           </p>
-        </div>
+        </Card>
       ) : (
         <ol className="mt-6 space-y-4">
           {recs.map((rec, idx) => {
             const sb = (rec.scoreBreakdown ?? {}) as Record<string, unknown>;
-            // New rows: { factors, matchedSkills, suitableIssues }. Old rows: flat factors.
             const factors = (sb.factors ?? sb) as Record<string, number>;
             const matched = (
               Array.isArray(sb.matchedSkills) ? sb.matchedSkills : []
@@ -76,7 +71,7 @@ export default async function RecommendationsPage() {
             const ghUrl = `https://github.com/${rec.repository.fullName}`;
 
             return (
-              <li key={rec.repository.id} className="glass rounded-2xl p-5">
+              <Card key={rec.repository.id} className="p-5">
                 <div className="flex flex-col gap-5 lg:flex-row lg:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -87,10 +82,9 @@ export default async function RecommendationsPage() {
                         href={ghUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-mono text-sm font-medium hover:text-primary"
+                        className="font-mono text-sm font-medium hover:text-primary"
                       >
                         {rec.repository.fullName}
-                        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
                       </a>
                       <HealthBadge
                         score={rec.repository.healthScore}
@@ -129,35 +123,28 @@ export default async function RecommendationsPage() {
                           Matched:
                         </span>
                         {matched.map((s) => (
-                          <span
-                            key={s}
-                            className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
-                          >
+                          <Badge key={s} variant="secondary" className="font-normal">
                             {s}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
                     )}
 
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <a
-                        href={ghUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition-opacity hover:opacity-90"
-                      >
-                        <Github className="h-4 w-4" /> View on GitHub
-                      </a>
-                      <Link
-                        href={`/repositories/${rec.repository.fullName}`}
-                        className="glass inline-flex h-9 items-center rounded-xl px-4 text-sm transition-colors hover:bg-card/80"
-                      >
-                        Details
-                      </Link>
+                      <Button asChild size="sm">
+                        <a href={ghUrl} target="_blank" rel="noopener noreferrer">
+                          <Github className="h-4 w-4" /> View on GitHub
+                        </a>
+                      </Button>
+                      <Button asChild size="sm" variant="outline">
+                        <Link href={`/repositories/${rec.repository.fullName}`}>
+                          Details
+                        </Link>
+                      </Button>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-5 lg:flex-col-reverse lg:items-end lg:justify-between">
+                  <div className="flex items-center justify-between gap-5 border-t border-border/60 pt-4 lg:flex-col-reverse lg:items-end lg:justify-between lg:border-l lg:border-t-0 lg:pl-5 lg:pt-0">
                     <div className="w-48">
                       <FactorBars factors={factors} />
                     </div>
@@ -171,7 +158,7 @@ export default async function RecommendationsPage() {
                     </div>
                   </div>
                 </div>
-              </li>
+              </Card>
             );
           })}
         </ol>
@@ -197,9 +184,7 @@ function SignInGate() {
         }}
         className="mt-6"
       >
-        <button className="inline-flex h-11 items-center rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition-opacity hover:opacity-90">
-          Sign in with GitHub
-        </button>
+        <Button size="lg">Sign in with GitHub</Button>
       </form>
     </main>
   );
