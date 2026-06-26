@@ -3,6 +3,7 @@ import { CircleDot, GitFork, PackageOpen, Search, Star } from 'lucide-react';
 import { apiGet } from '@/lib/api';
 import type { RepoListResponse } from '@/lib/types';
 import { HealthBadge } from '@/components/HealthBadge';
+import { TypographyH1, TypographyInlineCode } from '@/components/ui/typography';
 
 export default async function RepositoriesPage({
   searchParams,
@@ -20,7 +21,7 @@ export default async function RepositoriesPage({
     <main className="container py-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Repositories</h1>
+          <TypographyH1 className="text-3xl">Repositories</TypographyH1>
           <p className="mt-1 text-sm text-muted-foreground">
             {data ? `${data.total} analyzed` : 'Browse analyzed projects'} —
             sorted by health.
@@ -106,9 +107,9 @@ function EmptyState() {
       <p className="mt-3 font-medium">No repositories yet</p>
       <p className="mt-1 max-w-md text-sm text-muted-foreground">
         Start the worker and ingest one:{' '}
-        <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">
+        <TypographyInlineCode>
           npm run -w @openpath/worker enqueue -- facebook/react
-        </code>
+        </TypographyInlineCode>
       </p>
     </div>
   );

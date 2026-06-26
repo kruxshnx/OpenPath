@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Activity, ArrowRight, Gauge, Sparkles, Target } from 'lucide-react';
 import { apiGet } from '@/lib/api';
+import { TypographyH1, TypographyLead } from '@/components/ui/typography';
 
 export default async function Home() {
   const health = await apiGet<{ status: string; service: string }>('/health');
@@ -16,14 +17,14 @@ export default async function Home() {
             {health ? 'API online' : 'API offline'}
           </span>
 
-          <h1 className="max-w-3xl text-balance text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+          <TypographyH1 className="max-w-3xl leading-tight sm:text-5xl">
             Find the right open-source project to contribute to.
-          </h1>
-          <p className="max-w-2xl text-pretty text-lg text-muted-foreground">
+          </TypographyH1>
+          <TypographyLead className="max-w-2xl text-pretty">
             OpenPath analyzes repository health, estimates issue difficulty, and
             matches projects to your skills — so your next contribution actually
             lands.
-          </p>
+          </TypographyLead>
 
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link

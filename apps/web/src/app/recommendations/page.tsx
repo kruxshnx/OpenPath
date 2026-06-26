@@ -13,6 +13,7 @@ import { apiGet, API_URL } from '@/lib/api';
 import type { RecommendationDto } from '@/lib/types';
 import { HealthBadge } from '@/components/HealthBadge';
 import { FactorBars } from '@/components/FactorBars';
+import { TypographyH1 } from '@/components/ui/typography';
 
 export default async function RecommendationsPage() {
   const session = await auth();
@@ -37,9 +38,7 @@ export default async function RecommendationsPage() {
     <main className="container py-10">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Your recommendations
-          </h1>
+          <TypographyH1 className="text-3xl">Your recommendations</TypographyH1>
           <p className="mt-1 text-sm text-muted-foreground">
             Ranked by how well each project fits your skills.
           </p>
@@ -187,9 +186,7 @@ function SignInGate() {
       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/15 text-primary">
         <Sparkles className="h-6 w-6" />
       </div>
-      <h1 className="mt-4 text-2xl font-bold tracking-tight">
-        Your recommendations
-      </h1>
+      <TypographyH1 className="mt-4 text-3xl">Your recommendations</TypographyH1>
       <p className="mt-2 max-w-sm text-muted-foreground">
         Sign in with GitHub to get personalized, skill-matched recommendations.
       </p>

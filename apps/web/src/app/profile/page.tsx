@@ -3,6 +3,7 @@ import { UserRound } from 'lucide-react';
 import { auth, signIn } from '@/auth';
 import { apiGet, API_URL } from '@/lib/api';
 import type { Me, SkillDto } from '@/lib/types';
+import { TypographyH1 } from '@/components/ui/typography';
 
 const EXPERIENCE_LEVELS = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
 
@@ -52,7 +53,7 @@ export default async function ProfilePage() {
   if (!me) {
     return (
       <main className="container py-10">
-        <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
+        <TypographyH1 className="text-3xl">Profile</TypographyH1>
         <p className="glass mt-4 rounded-2xl p-6 text-sm text-muted-foreground">
           Couldn&apos;t load your profile from the API (is the database up?).
         </p>
@@ -67,7 +68,7 @@ export default async function ProfilePage() {
           <UserRound className="h-5 w-5" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
+          <TypographyH1 className="text-3xl">Profile</TypographyH1>
           <p className="text-sm text-muted-foreground">
             Signed in as{' '}
             <span className="font-mono text-foreground">@{me.login}</span> — your
@@ -178,7 +179,7 @@ function SignInGate() {
       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
         <UserRound className="h-6 w-6" />
       </div>
-      <h1 className="mt-4 text-2xl font-bold tracking-tight">Profile</h1>
+      <TypographyH1 className="mt-4 text-3xl">Profile</TypographyH1>
       <p className="mt-2 max-w-sm text-muted-foreground">
         Sign in to set up your skills and experience level.
       </p>
