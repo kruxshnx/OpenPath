@@ -1,0 +1,26 @@
+{
+  "name": "@openpath/worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js",
+    "preview": "tsx src/ingestion/preview.ts",
+    "score-preview": "tsx src/scoring/score-preview.ts",
+    "recommend-preview": "tsx src/recommendation/recommend-preview.ts",
+    "enqueue": "tsx src/enqueue.ts",
+    "score": "tsx src/score.ts",
+    "recommend": "tsx src/recommend.ts"
+  },
+  "dependencies": {
+    "@openpath/db": "*",
+    "bullmq": "^5.34.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
