@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
+import { createServer } from 'node:http';
 import { resolve } from 'node:path';
 import { Queue, Worker, QueueEvents } from 'bullmq';
 import { INGESTION_QUEUE, redisConnection } from './redis';
@@ -70,3 +71,23 @@ const events = new QueueEvents(INGESTION_QUEUE, { connection });
 events.on('completed', ({ jobId }) => console.log(`[worker] job ${jobId} completed`));
 
 console.log('[worker] OpenPath ingestion worker started');
+
+const port = Number(process.env.PORT ?? process.env.WORKER_PORT ?? 4001);
+createServer((req, res) => {
+  if (req.url === '/health') {
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(
+      JSON.stringify({
+        status: 'ok',
+        service: 'openpath-worker',
+        time: new Date().toISOString(),
+      }),
+    );
+    return;
+  }
+
+  res.writeHead(404, { 'content-type': 'application/json' });
+  res.end(JSON.stringify({ statusCode: 404, message: 'Not Found' }));
+}).listen(port, () => {
+  console.log(`[worker] health server listening on http://localhost:${port}`);
+});

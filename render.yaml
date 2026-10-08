@@ -22,12 +22,13 @@ services:
       - key: ENCRYPTION_KEY
         sync: false
 
-  - type: worker
+  - type: web
     name: openpath-worker
     runtime: node
     plan: free
     buildCommand: npm ci && npm run build -w @openpath/db && npm run build -w @openpath/worker
     startCommand: npm run start -w @openpath/worker
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
