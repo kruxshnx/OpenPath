@@ -3,7 +3,7 @@ services:
     name: openpath-api
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build -w @openpath/db && npm run build -w @openpath/api
+    buildCommand: npm ci --include=dev && npm run build -w @openpath/db && npm run build -w @openpath/api
     startCommand: npm run start -w @openpath/api
     healthCheckPath: /api/health
     envVars:
@@ -26,7 +26,7 @@ services:
     name: openpath-worker
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build -w @openpath/db && npm run build -w @openpath/worker
+    buildCommand: npm ci --include=dev && npm run build -w @openpath/db && npm run build -w @openpath/worker
     startCommand: npm run start -w @openpath/worker
     healthCheckPath: /health
     envVars:
