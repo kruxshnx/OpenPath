@@ -1,0 +1,39 @@
+services:
+  - type: web
+    name: openpath-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build -w @openpath/db && npm run build -w @openpath/api
+    startCommand: npm run start -w @openpath/api
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_PORT
+        value: 10000
+      - key: WEB_ORIGIN
+        value: https://open-path-delta.vercel.app
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ENCRYPTION_KEY
+        sync: false
+
+  - type: worker
+    name: openpath-worker
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build -w @openpath/db && npm run build -w @openpath/worker
+    startCommand: npm run start -w @openpath/worker
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false

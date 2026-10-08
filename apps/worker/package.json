@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "build": "tsc",
+    "lint": "tsc --noEmit -p tsconfig.json",
     "start": "node dist/main.js",
     "preview": "tsx src/ingestion/preview.ts",
     "score-preview": "tsx src/scoring/score-preview.ts",
